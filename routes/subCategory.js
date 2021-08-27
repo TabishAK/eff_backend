@@ -31,7 +31,7 @@ const upload = multer({
 
 // Add category
 app.post("/add", upload.single("subCategory_image"), async (req, res) => {
-  const url = `http://localhost:8000/` + req.file.path.replace(/\\/g, "/");
+  const url = req.file.path.replace(/\\/g, "/");
   const { subCategory_name, subCategory_slug, mainCategory } = req.body;
 
   const subCategoryAvailable = await SubCategoryModel.findOne({

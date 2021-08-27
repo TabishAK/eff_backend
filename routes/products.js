@@ -28,12 +28,12 @@ const upload = multer({
   fileFilter: fileFilter,
 });
 
-// Add category
+// Add products
 app.post("/add", upload.single("product_image"), async (req, res) => {
-  const url = `http://localhost:8000/` + req.file.path.replace(/\\/g, "/");
+  const url = req.file.path.replace(/\\/g, "/");
   const { product_name, product_slug, subCategory } = req.body;
-  const category = await ProductModel.findOne({ product_name: product_name });
 
+  const category = await ProductModel.findOne({ product_name: product_name });
   if (category) return res.status(400).send("This category already exists");
 
   const products = new ProductModel({
@@ -58,7 +58,7 @@ app.post("/add", upload.single("product_image"), async (req, res) => {
     });
 });
 
-//Get Category
+//Get Products
 app.get("/", async (req, res) => {
   ProductModel.find()
     .exec()
@@ -69,6 +69,16 @@ app.get("/", async (req, res) => {
     .catch((e) => {
       res.send({ e });
     });
+});
+
+app.delete("/delete", async (req, res) => {
+  // Image.findByIdAndRemove(req.body.id)
+  //   .then((p) => {
+  //     res.status(200).send(p);
+  //   })
+  //   .catch((e) => {
+  //     res.send({ e });
+  //   });
 });
 
 module.exports = app;

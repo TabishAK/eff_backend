@@ -30,7 +30,7 @@ const upload = multer({
 
 // Add category
 app.post("/add", upload.single("swatch_image"), async (req, res) => {
-  const url = `http://localhost:8000/` + req.file.path.replace(/\\/g, "/");
+  const url = req.file.path.replace(/\\/g, "/");
   const { swatch_name, swatch_slug, product } = req.body;
   const availSwatch = await SwatchesModel.findOne({
     swatch_name: swatch_name,
