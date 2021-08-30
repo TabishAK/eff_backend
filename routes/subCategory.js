@@ -77,4 +77,39 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.delete("/delete", async (req, res) => {
+  const { _id, subCategory_image } = req.body;
+  SubCategoryModel.deleteOne({ _id: _id })
+    .then((p) => {
+      fs.unlinkSync(subCategory_image);
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.put("/update", upload.single("subCategory_image"), async (req, res) => {
+  const url = req.file.path.replace(/\\/g, "/");
+  const { _id, subCategory_name, subCategory_slug, mainCategory } = req.body;
+
+  SubCategoryModel.findByIdAndUpdate(
+    { _id: _id },
+    {
+      $set: {
+        subCategory_name: subCategory_name,
+        subCategory_slug: subCategory_slug,
+        subCategory_image: url,
+        mainCategory: mainCategory,
+      },
+    }
+  )
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 module.exports = app;

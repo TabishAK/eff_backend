@@ -2,6 +2,7 @@ const ProductModel = require("../models/productsModal");
 const express = require("express");
 const app = express.Router();
 const multer = require("multer");
+const fs = require("fs");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -72,13 +73,37 @@ app.get("/", async (req, res) => {
 });
 
 app.delete("/delete", async (req, res) => {
-  // Image.findByIdAndRemove(req.body.id)
-  //   .then((p) => {
-  //     res.status(200).send(p);
-  //   })
-  //   .catch((e) => {
-  //     res.send({ e });
-  //   });
+  const { _id, product_image } = req.body;
+  ProductModel.deleteOne({ _id: _id })
+    .then((p) => {
+      fs.unlinkSync(product_image);
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.put("/update", upload.single("product_image"), async (req, res) => {
+  const url = req.file.path.replace(/\\/g, "/");
+  const { _id, product_name, product_slug, subCategory } = req.body;
+  ProductModel.findByIdAndUpdate(
+    { _id: _id },
+    {
+      $set: {
+        product_name: product_name,
+        product_slug: product_slug,
+        product_image: url,
+        subCategory: subCategory,
+      },
+    }
+  )
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
 });
 
 module.exports = app;

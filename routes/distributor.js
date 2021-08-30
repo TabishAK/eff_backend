@@ -43,4 +43,42 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.delete("/delete", async (req, res) => {
+  DistributorModel.deleteOne({ _id: req.body._id })
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.put("/update", async (req, res) => {
+  const { _id, distributor_name, distributor_link } = req.body;
+
+  const distributor = await DistributorModel.findOne({
+    distributor_name: distributor_name,
+    distributor_link: distributor_link,
+  });
+
+  if (distributor)
+    return res.status(400).send("This Distributor Already Exists");
+
+  SubCategoryModel.findByIdAndUpdate(
+    { _id: _id },
+    {
+      $set: {
+        distributor_name: distributor_name,
+        distributor_link: distributor_link,
+      },
+    }
+  )
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 module.exports = app;

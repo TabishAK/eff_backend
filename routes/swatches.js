@@ -79,4 +79,39 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.delete("/delete", async (req, res) => {
+  const { _id, swatch_image } = req.body;
+  SwatchesModel.deleteOne({ _id: _id })
+    .then((p) => {
+      fs.unlinkSync(swatch_image);
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.put("/update", upload.single("swatch_image"), async (req, res) => {
+  const url = req.file.path.replace(/\\/g, "/");
+  const { _id, swatch_name, swatch_slug, product } = req.body;
+
+  SwatchesModel.findByIdAndUpdate(
+    { _id: _id },
+    {
+      $set: {
+        swatch_name: swatch_name,
+        swatch_slug: swatch_slug,
+        swatch_image: url,
+        product: product,
+      },
+    }
+  )
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 module.exports = app;

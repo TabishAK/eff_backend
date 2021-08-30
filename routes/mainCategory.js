@@ -40,4 +40,40 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.delete("/delete", async (req, res) => {
+  MainCategoryModel.deleteOne({ _id: req.body._id })
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.put("/update", async (req, res) => {
+  const { _id, category_name } = req.body;
+
+  const availMainCategory = await MainCategoryModel.findOne({
+    category_name: category_name,
+  });
+
+  if (availMainCategory)
+    return res.status(400).send("This category already exists");
+
+  MainCategoryModel.findByIdAndUpdate(
+    { _id: _id },
+    {
+      $set: {
+        category_name: category_name,
+      },
+    }
+  )
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 module.exports = app;
