@@ -11,10 +11,13 @@ const swatches = require("./routes/swatches");
 const distributor = require("./routes/distributor");
 const banner = require("./routes/banner");
 
-mongoose.connect("mongodb://localhost/eff", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 app.use(cors());
 app.use("/uploads", express.static("./uploads"));
