@@ -3,7 +3,7 @@ var cors = require("cors");
 var app = express();
 bodyParser = require("body-parser");
 var mongoose = require("mongoose");
-
+var multipart = require("connect-multiparty");
 const products = require("./routes/products");
 const mainCategory = require("./routes/mainCategory");
 const subCategories = require("./routes/subCategory");
