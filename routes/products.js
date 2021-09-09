@@ -2,48 +2,32 @@ const ProductModel = require("../models/productsModal");
 const express = require("express");
 const app = express.Router();
 const multer = require("multer");
-const fs = require("fs");
+const { uploadFile } = require("../services/s3");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/products");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
+const upload = multer({ dest: "uploads/" });
+const folder = "products/";
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
-  fileFilter: fileFilter,
-});
-
-// Add products
 app.post("/add", upload.single("product_image"), async (req, res) => {
-  const url = req.file.path.replace(/\\/g, "/");
   const { product_name, product_slug, subCategory } = req.body;
+  const productAvailable = await ProductModel.findOne({
+    product_name: product_name,
+  });
 
-  const category = await ProductModel.findOne({ product_name: product_name });
-  if (category) return res.status(400).send("This category already exists");
+  if (productAvailable)
+    return res.status(400).send("This Product already exists");
+
+  const file = req.file;
+  const result = await uploadFile(file, folder);
+
+  if (!result)
+    res.status(400).send({ message: "Pic not uploaded as well as data" });
 
   const products = new ProductModel({
     product_name: product_name,
-    product_image: url,
+    product_image: result.Location,
     product_slug: product_slug,
     subCategory: subCategory,
   });
-
   products
     .save()
     .then((c) => {
@@ -85,15 +69,27 @@ app.delete("/delete", async (req, res) => {
 });
 
 app.put("/update", upload.single("product_image"), async (req, res) => {
-  const url = req.file.path.replace(/\\/g, "/");
   const { _id, product_name, product_slug, subCategory } = req.body;
-  ProductModel.findByIdAndUpdate(
+  const productAvailable = await ProductModel.findOne({
+    product_name: product_name,
+  });
+
+  if (productAvailable)
+    return res.status(400).send("This Product already exists");
+
+  const file = req.file;
+  const result = await uploadFile(file, folder);
+
+  if (!result)
+    res.status(400).send({ message: "Pic not uploaded as well as data" });
+
+  ProductModel.findOneAndUpdate(
     { _id: _id },
     {
       $set: {
         product_name: product_name,
         product_slug: product_slug,
-        product_image: url,
+        product_image: result.Location,
         subCategory: subCategory,
       },
     }

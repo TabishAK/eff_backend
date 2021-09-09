@@ -1,44 +1,22 @@
-const SwatchesModel = require("../models/swatchesModel");
+const BroucherModel = require("../models/broucherModel");
 const express = require("express");
 const app = express.Router();
 const multer = require("multer");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/swatches");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
-  fileFilter: fileFilter,
-});
+const { uploadFile } = require("../services/s3");
+const upload = multer({ dest: "uploads/" });
 
 // Add category
 app.post("/add", upload.single("swatch_image"), async (req, res) => {
   const url = req.file.path.replace(/\\/g, "/");
   const { swatch_name, swatch_slug, product } = req.body;
-  const availSwatch = await SwatchesModel.findOne({
+  const availSwatch = await BroucherModel.findOne({
     swatch_name: swatch_name,
   });
 
   if (availSwatch) return res.status(400).send("This category already exists");
 
-  const swatch = new SwatchesModel({
+  const swatch = new BroucherModel({
     swatch_name: swatch_name,
     swatch_image: url,
     swatch_slug: swatch_slug,
@@ -62,7 +40,7 @@ app.post("/add", upload.single("swatch_image"), async (req, res) => {
 
 //Get Category
 app.get("/", async (req, res) => {
-  SwatchesModel.find()
+  BroucherModel.find()
     .populate({
       path: "product",
       populate: {
@@ -81,7 +59,7 @@ app.get("/", async (req, res) => {
 
 app.delete("/delete", async (req, res) => {
   const { _id, swatch_image } = req.body;
-  SwatchesModel.deleteOne({ _id: _id })
+  BroucherModel.deleteOne({ _id: _id })
     .then((p) => {
       fs.unlinkSync(swatch_image);
       res.status(200).send(p);
@@ -95,7 +73,7 @@ app.put("/update", upload.single("swatch_image"), async (req, res) => {
   const url = req.file.path.replace(/\\/g, "/");
   const { _id, swatch_name, swatch_slug, product } = req.body;
 
-  SwatchesModel.findByIdAndUpdate(
+  BroucherModel.findByIdAndUpdate(
     { _id: _id },
     {
       $set: {

@@ -3,35 +3,8 @@ const express = require("express");
 const multer = require("multer");
 const app = express.Router();
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/subCategory");
-  },
-
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  limits: {
-    fileSize: 1024 * 1024 * 5,
-  },
-  fileFilter: fileFilter,
-});
-
 // Add category
-app.post("/add", upload.single("subCategory_image"), async (req, res) => {
-  const url = req.file.path.replace(/\\/g, "/");
+app.post("/add", async (req, res) => {
   const { subCategory_name, subCategory_slug, mainCategory } = req.body;
 
   const subCategoryAvailable = await SubCategoryModel.findOne({
@@ -43,7 +16,6 @@ app.post("/add", upload.single("subCategory_image"), async (req, res) => {
 
   const subCategory = new SubCategoryModel({
     subCategory_name: subCategory_name,
-    subCategory_image: url,
     subCategory_slug: subCategory_slug,
     mainCategory: mainCategory,
   });
@@ -78,10 +50,9 @@ app.get("/", async (req, res) => {
 });
 
 app.delete("/delete", async (req, res) => {
-  const { _id, subCategory_image } = req.body;
+  const { _id } = req.body;
   SubCategoryModel.deleteOne({ _id: _id })
     .then((p) => {
-      fs.unlinkSync(subCategory_image);
       res.status(200).send(p);
     })
     .catch((e) => {
@@ -89,9 +60,15 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-app.put("/update", upload.single("subCategory_image"), async (req, res) => {
-  const url = req.file.path.replace(/\\/g, "/");
+app.put("/update", async (req, res) => {
   const { _id, subCategory_name, subCategory_slug, mainCategory } = req.body;
+
+  const subCatAvailable = await SubCategoryModel.findOne({
+    subCategory_name: subCategory_name,
+  });
+
+  if (subCatAvailable)
+    return res.status(400).send("This Product already exists");
 
   SubCategoryModel.findByIdAndUpdate(
     { _id: _id },
@@ -99,7 +76,6 @@ app.put("/update", upload.single("subCategory_image"), async (req, res) => {
       $set: {
         subCategory_name: subCategory_name,
         subCategory_slug: subCategory_slug,
-        subCategory_image: url,
         mainCategory: mainCategory,
       },
     }
