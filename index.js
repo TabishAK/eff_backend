@@ -26,6 +26,7 @@ mongoose.connect(
 //   bodyParser.urlencoded({
 //     extended: true,
 //   })
+//
 // );
 
 app.use("/banner", banner);
