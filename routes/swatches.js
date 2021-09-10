@@ -1,4 +1,4 @@
-const BroucherModel = require("../models/broucherModel");
+const BroucherModel = require("../models/swatchesModel");
 const express = require("express");
 const app = express.Router();
 const multer = require("multer");
