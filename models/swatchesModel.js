@@ -1,8 +1,11 @@
 var mongoose = require("mongoose");
 
-const swatchSchema = new mongoose.Schema({
-  swatch_name: { type: String, required: false },
+const imageArray = new mongoose.Schema({
   swatch_image: { type: String, required: false },
+});
+
+const swatchSchema = new mongoose.Schema({
+  swatches: [imageArray],
   products: {
     type: mongoose.SchemaTypes.ObjectId,
     required: true,

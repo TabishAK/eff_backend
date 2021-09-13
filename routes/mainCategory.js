@@ -28,8 +28,8 @@ app.post("/add", async (req, res) => {
     });
 });
 
-app.get("/", async (req, res) => {
-  MainCategoryModel.find()
+app.post("/", async (req, res) => {
+  MainCategoryModel.find(req.body)
     .exec()
     .then((p) => {
       console.log(p);
@@ -51,29 +51,26 @@ app.delete("/delete", async (req, res) => {
 });
 
 app.put("/update", async (req, res) => {
-  const { _id, category_name } = req.body;
-
   const availMainCategory = await MainCategoryModel.findOne({
-    category_name: category_name,
+    category_name: req.body.category_name,
   });
 
   if (availMainCategory)
     return res.status(400).send("This category already exists");
 
-  MainCategoryModel.findByIdAndUpdate(
-    { _id: _id },
-    {
-      $set: {
-        category_name: category_name,
-      },
+  CategoryModal.updateOne({ _id: req.body._id }, req.body, (error, success) => {
+    if (error) {
+      res.send({
+        message: "Update fail !",
+        error,
+      });
+    } else {
+      res.send({
+        message: "Successfuly updated !",
+        success,
+      });
     }
-  )
-    .then((p) => {
-      res.status(200).send(p);
-    })
-    .catch((e) => {
-      res.send({ e });
-    });
+  });
 });
 
 module.exports = app;

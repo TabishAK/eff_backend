@@ -5,12 +5,13 @@ const multer = require("multer");
 const { uploadFile } = require("../services/s3");
 const fs = require("fs");
 const upload = multer({ dest: "uploads/" });
-const folder = "products/";
+const _ = require("lodash");
+const SubCategory = require("../models/subCategoryModel");
 
 app.post(
   "/add",
   upload.fields([
-    { name: "product_creative" },
+    { name: "product_creative_image" },
     { name: "product_broucher_image" },
   ]),
   async (req, res) => {
@@ -24,13 +25,21 @@ app.post(
     if (productAvailable)
       return res.status(400).send("This Product already exists");
 
-    const file = req.files.product_creative[0];
-    const result = await uploadFile(file, folder);
+    const folder1 = `${subCategory}/${product_name}/Creative Image/`;
+    const folder2 = `${subCategory}/${product_name}/Broucher Image/`;
+    const file = req.files.product_creative_image[0];
+    const result = await uploadFile(file, folder1);
     fs.unlinkSync(file.path);
 
+    if (!result)
+      return res.status(400).send("Creative image could not be saved ");
+
     const file2 = req.files.product_broucher_image[0];
-    const result2 = await uploadFile(file2, folder);
+    const result2 = await uploadFile(file2, folder2);
     fs.unlinkSync(file2.path);
+
+    if (!result2)
+      return res.status(400).send("Broucher image could not be saved ");
 
     const products = new ProductModel({
       product_name: product_name,
@@ -58,8 +67,8 @@ app.post(
 );
 
 //Get Products
-app.get("/", async (req, res) => {
-  ProductModel.find()
+app.post("/", async (req, res) => {
+  ProductModel.find(req.body)
     .exec()
     .then((p) => {
       console.log(p);
@@ -74,7 +83,6 @@ app.delete("/delete", async (req, res) => {
   const { _id, product_image } = req.body;
   ProductModel.deleteOne({ _id: _id })
     .then((p) => {
-      fs.unlinkSync(product_image);
       res.status(200).send(p);
     })
     .catch((e) => {
@@ -82,38 +90,48 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-app.put("/update", async (req, res) => {
-  const { _id, product_name, product_slug, subCategory } = req.body;
-  const productAvailable = await ProductModel.findOne({
-    product_name: product_name,
-  });
-
-  if (productAvailable)
-    return res.status(400).send("This Product already exists");
-
-  const file = req.file;
-  const result = await uploadFile(file, folder);
-
-  if (!result)
-    res.status(400).send({ message: "Pic not uploaded as well as data" });
-
-  ProductModel.findOneAndUpdate(
-    { _id: _id },
-    {
-      $set: {
-        product_name: product_name,
-        product_slug: product_slug,
-        product_image: result.Location,
-        subCategory: subCategory,
-      },
+app.put(
+  "/update",
+  upload.fields([
+    { name: "product_creative_image" },
+    { name: "product_broucher_image" },
+  ]),
+  async (req, res) => {
+    try {
+      if (req.files.product_creative_image !== undefined) {
+        const folder1 = `${req.subCategory}/${req.product_name}/Creative Image/`;
+        const file = req.files.product_creative_image[0];
+        const result = await uploadFile(file, folder1);
+        fs.unlinkSync(file.path);
+        req.body.product_creative_image = result.Location;
+      }
+      if (req.files.product_broucher_image !== undefined) {
+        const folder2 = `${req.subCategory}/${req.product_name}/Broucher Image/`;
+        const file2 = req.files.product_broucher_image[0];
+        const result2 = await uploadFile(file2, folder2);
+        fs.unlinkSync(file2.path);
+        req.body.product_creative_image = result2.Location;
+      }
+    } catch (err) {
+      console.log(err);
     }
-  )
-    .then((p) => {
-      res.status(200).send(p);
-    })
-    .catch((e) => {
-      res.send({ e });
+
+    const hell = JSON.parse(JSON.stringify(req.body));
+
+    ProductModel.updateOne({ _id: req.body._id }, hell, (error, success) => {
+      if (error) {
+        res.send({
+          message: "Update fail !",
+          error,
+        });
+      } else {
+        res.send({
+          message: "Successfuly updated !",
+          success,
+        });
+      }
     });
-});
+  }
+);
 
 module.exports = app;

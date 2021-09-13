@@ -1,7 +1,7 @@
 const SubCategoryModel = require("../models/subCategoryModel");
 const express = require("express");
-const multer = require("multer");
 const app = express.Router();
+var _ = require("lodash");
 
 // Add category
 app.post("/add", async (req, res) => {
@@ -36,12 +36,11 @@ app.post("/add", async (req, res) => {
 });
 
 //Get Category
-app.get("/", async (req, res) => {
-  SubCategoryModel.find()
+app.post("/", async (req, res) => {
+  SubCategoryModel.find(req.body)
     .populate("mainCategory")
     .exec()
     .then((p) => {
-      console.log(p);
       res.status(200).send(p);
     })
     .catch((e) => {
@@ -61,31 +60,21 @@ app.delete("/delete", async (req, res) => {
 });
 
 app.put("/update", async (req, res) => {
-  const { _id, subCategory_name, subCategory_slug, mainCategory } = req.body;
-
-  const subCatAvailable = await SubCategoryModel.findOne({
-    subCategory_name: subCategory_name,
-  });
-
-  if (subCatAvailable)
-    return res.status(400).send("This Product already exists");
-
-  SubCategoryModel.findByIdAndUpdate(
-    { _id: _id },
-    {
-      $set: {
-        subCategory_name: subCategory_name,
-        subCategory_slug: subCategory_slug,
-        mainCategory: mainCategory,
-      },
+  SubCategoryModel.updateOne(
+    { _id: req.body._id },
+    req.body,
+    async (error, success) => {
+      if (error) {
+        res.send({
+          message: "Update fail! Maybe this sub-category already exists",
+        });
+      } else {
+        res.send({
+          message: "Successfuly updated !",
+        });
+      }
     }
-  )
-    .then((p) => {
-      res.status(200).send(p);
-    })
-    .catch((e) => {
-      res.send({ e });
-    });
+  );
 });
 
 module.exports = app;
