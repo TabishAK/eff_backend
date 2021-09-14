@@ -17,7 +17,7 @@ app.post("/add", upload.array("swatch_image"), async (req, res) => {
     const folder = `${PM.subCategory}/${PM.product_name}/swatches/`;
 
     const agaya = req.files.map(async (r) => {
-      let result = await uploadFile(r, folder);
+      let result = await uploadFile(r, folder, "image/jpeg");
       fs.unlinkSync(r.path);
       return result;
     });

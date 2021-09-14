@@ -9,14 +9,14 @@ const region = process.env.S3_BUCKET_REGION;
 
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
-function uploadFile(file, folder) {
+function uploadFile(file, folder, contentType) {
   const fileStream = fs.createReadStream(file.path);
   const uploadParams = {
     Bucket: "eff-photos",
     Body: fileStream,
     Key: folder + file.filename,
     ACL: "public-read",
-    ContentType: "image/jpeg",
+    ContentType: contentType,
   };
   return s3.upload(uploadParams).promise();
 }

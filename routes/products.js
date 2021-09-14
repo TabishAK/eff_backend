@@ -6,13 +6,13 @@ const { uploadFile } = require("../services/s3");
 const fs = require("fs");
 const upload = multer({ dest: "uploads/" });
 const _ = require("lodash");
-const SubCategory = require("../models/subCategoryModel");
 
 app.post(
   "/add",
   upload.fields([
     { name: "product_creative_image" },
     { name: "product_broucher_image" },
+    { name: "pdf" },
   ]),
   async (req, res) => {
     const { product_name, product_slug, subCategory, product_description } =
@@ -27,18 +27,27 @@ app.post(
 
     const folder1 = `${subCategory}/${product_name}/Creative Image/`;
     const folder2 = `${subCategory}/${product_name}/Broucher Image/`;
+    const folder3 = `${subCategory}/${product_name}/pdf/`;
+
     const file = req.files.product_creative_image[0];
-    const result = await uploadFile(file, folder1);
+    const result = await uploadFile(file, folder1, "image/jpeg");
     fs.unlinkSync(file.path);
 
     if (!result)
-      return res.status(400).send("Creative image could not be saved ");
+      return res.status(400).send("Creative image could not be saved");
 
     const file2 = req.files.product_broucher_image[0];
-    const result2 = await uploadFile(file2, folder2);
+    const result2 = await uploadFile(file2, folder2, "image/jpeg");
     fs.unlinkSync(file2.path);
 
     if (!result2)
+      return res.status(400).send("Broucher image could not be saved ");
+
+    const file3 = req.files.pdf[0];
+    const result3 = await uploadFile(file3, folder3, "application/pdf");
+    fs.unlinkSync(file3.path);
+
+    if (!result3)
       return res.status(400).send("Broucher image could not be saved ");
 
     const products = new ProductModel({
@@ -47,6 +56,7 @@ app.post(
       product_broucher_image: result2.Location,
       product_slug: product_slug,
       subCategory: subCategory,
+      pdf: result3.Location,
       product_description: product_description,
     });
 
@@ -71,7 +81,6 @@ app.post("/", async (req, res) => {
   ProductModel.find(req.body)
     .exec()
     .then((p) => {
-      console.log(p);
       res.status(200).send(p);
     })
     .catch((e) => {
@@ -101,14 +110,15 @@ app.put(
       if (req.files.product_creative_image !== undefined) {
         const folder1 = `${req.subCategory}/${req.product_name}/Creative Image/`;
         const file = req.files.product_creative_image[0];
-        const result = await uploadFile(file, folder1);
+        const result = await uploadFile(file, folder1, "image/jpeg");
         fs.unlinkSync(file.path);
         req.body.product_creative_image = result.Location;
       }
+
       if (req.files.product_broucher_image !== undefined) {
         const folder2 = `${req.subCategory}/${req.product_name}/Broucher Image/`;
         const file2 = req.files.product_broucher_image[0];
-        const result2 = await uploadFile(file2, folder2);
+        const result2 = await uploadFile(file2, folder2, "image/jpeg");
         fs.unlinkSync(file2.path);
         req.body.product_creative_image = result2.Location;
       }

@@ -3,40 +3,19 @@ const express = require("express");
 const app = express.Router();
 const multer = require("multer");
 const fs = require("fs");
+const upload = multer({ dest: "uploads/" });
+const { uploadFile } = require("../services/s3");
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "./uploads/banners");
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + file.originalname);
-  },
-});
+app.post("/addVideo", upload.single("video"), async (req, res) => {
+  const banner = await Banner.findOne();
+  const folder1 = "banners/video/";
+  const file = req.file;
 
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
-    cb(null, true);
-  } else {
-    cb(null, false);
-  }
-};
-
-const upload = multer({
-  storage: storage,
-  // limits: {
-  //   fileSize: 1024 * 1024 * 5,
-  // },
-});
-
-// Add products
-app.post("/add", upload.array("product_image"), async (req, res) => {
-  const banner = await Banner.find();
   if (!banner) {
+    const result1 = await uploadFile(file, folder1, "video/mp4");
+    fs.unlinkSync(file.path);
     new Banner({
-      video: req.files[0].path.replace(/\\/g, "/"),
-      image_1: req.files[1].path.replace(/\\/g, "/"),
-      image_2: req.files[2].path.replace(/\\/g, "/"),
-      image_3: req.files[3].path.replace(/\\/g, "/"),
+      video: result1.Location,
     })
       .save()
       .then((p) => {
@@ -45,24 +24,176 @@ app.post("/add", upload.array("product_image"), async (req, res) => {
       .catch((e) => {
         res.send({ e });
       });
+  } else if (banner) {
+    const result2 = await uploadFile(file, folder1, "video/mp4");
+    fs.unlinkSync(file.path);
+    banner.video = result2.Location;
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
   }
+});
 
+app.delete("/deleteVideo", async (req, res) => {
+  const banner = await Banner.findOne();
   if (banner) {
-    try {
-      fs.unlinkSync(banner[0].video);
-      fs.unlinkSync(banner[0].image_1);
-      fs.unlinkSync(banner[0].image_2);
-      fs.unlinkSync(banner[0].image_3);
-    } catch (err) {
-      console.log(err);
-    }
-    await Banner.deleteMany({});
+    banner.video = "";
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/add_image_1", upload.single("image_1"), async (req, res) => {
+  const banner = await Banner.findOne();
+  const folder1 = "banners/images/";
+  const file = req.file;
+
+  if (!banner) {
+    const result1 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
     new Banner({
-      video: req.files[0].path,
-      image_1: req.files[1].path,
-      image_2: req.files[2].path,
-      image_3: req.files[3].path,
+      image_1: result1.Location,
     })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (banner) {
+    const result2 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
+    banner.image_1 = result2.Location;
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.delete("/delete_image_1", async (req, res) => {
+  const banner = await Banner.findOne();
+  if (banner) {
+    banner.image_1 = "";
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/add_image_2", upload.single("image_2"), async (req, res) => {
+  const banner = await Banner.findOne();
+  const folder1 = "banners/images/";
+  const file = req.file;
+
+  if (!banner) {
+    const result1 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
+    new Banner({
+      image_2: result1.Location,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (banner) {
+    const result2 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
+    banner.image_2 = result2.Location;
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.delete("/delete_image_2", async (req, res) => {
+  const banner = await Banner.findOne();
+  if (banner) {
+    banner.image_2 = "";
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/add_image_3", upload.single("image_3"), async (req, res) => {
+  const banner = await Banner.findOne();
+  const folder1 = "banners/images/";
+  const file = req.file;
+
+  if (!banner) {
+    const result1 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
+    new Banner({
+      image_3: result1.Location,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (banner) {
+    const result2 = await uploadFile(file, folder1, "image/jpeg");
+    fs.unlinkSync(file.path);
+
+    banner.image_3 = result2.Location;
+    banner
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.delete("/delete_image_3", async (req, res) => {
+  const banner = await Banner.findOne();
+  if (banner) {
+    banner.image_3 = "";
+    banner
       .save()
       .then((p) => {
         res.status(200).send(p);
@@ -74,7 +205,6 @@ app.post("/add", upload.array("product_image"), async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
-  console.log(process.env.S3_ACCESS_KEY);
   Banner.find()
     .exec()
     .then((p) => {
