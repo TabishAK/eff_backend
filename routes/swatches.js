@@ -2,6 +2,7 @@ const Swatch = require("../models/swatchesModel");
 const express = require("express");
 const app = express.Router();
 const multer = require("multer");
+
 const ProductsModel = require("../models/productsModal");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });

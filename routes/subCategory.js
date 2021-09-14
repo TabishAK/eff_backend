@@ -2,9 +2,13 @@ const SubCategoryModel = require("../models/subCategoryModel");
 const express = require("express");
 const app = express.Router();
 var _ = require("lodash");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+const fs = require("fs");
+const { uploadFile } = require("../services/s3");
 
 // Add category
-app.post("/add", async (req, res) => {
+app.post("/add", upload.single("pdf"), async (req, res) => {
   const { subCategory_name, subCategory_slug, mainCategory } = req.body;
 
   const subCategoryAvailable = await SubCategoryModel.findOne({
@@ -14,9 +18,17 @@ app.post("/add", async (req, res) => {
   if (subCategoryAvailable)
     return res.status(400).send("This category already exists");
 
+  const folder = `pdf/${subCategory_name}/`;
+  const file = req.file;
+  const result = await uploadFile(file, folder, "application/pdf");
+  fs.unlinkSync(file.path);
+
+  if (!result) return res.status(400).send("Broucher could not be saved ");
+
   const subCategory = new SubCategoryModel({
     subCategory_name: subCategory_name,
     subCategory_slug: subCategory_slug,
+    pdf: result.Location,
     mainCategory: mainCategory,
   });
 

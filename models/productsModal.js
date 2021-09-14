@@ -6,7 +6,6 @@ const productSchema = new mongoose.Schema({
   product_broucher_image: { type: String, required: true },
   product_description: { type: String, required: false },
   product_slug: { type: String, required: true },
-  pdf: { type: String, required: false },
   subCategory: {
     type: mongoose.SchemaTypes.ObjectId,
     required: false,

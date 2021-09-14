@@ -12,7 +12,6 @@ app.post(
   upload.fields([
     { name: "product_creative_image" },
     { name: "product_broucher_image" },
-    { name: "pdf" },
   ]),
   async (req, res) => {
     const { product_name, product_slug, subCategory, product_description } =
@@ -43,20 +42,12 @@ app.post(
     if (!result2)
       return res.status(400).send("Broucher image could not be saved ");
 
-    const file3 = req.files.pdf[0];
-    const result3 = await uploadFile(file3, folder3, "application/pdf");
-    fs.unlinkSync(file3.path);
-
-    if (!result3)
-      return res.status(400).send("Broucher image could not be saved ");
-
     const products = new ProductModel({
       product_name: product_name,
       product_creative_image: result.Location,
       product_broucher_image: result2.Location,
       product_slug: product_slug,
       subCategory: subCategory,
-      pdf: result3.Location,
       product_description: product_description,
     });
 
