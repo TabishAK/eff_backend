@@ -3,8 +3,8 @@ const express = require("express");
 const app = express.Router();
 const multer = require("multer");
 const fs = require("fs");
-const upload = multer({ dest: "uploads/" });
 const { uploadFile } = require("../services/s3");
+const upload = multer({ dest: "uploads/" });
 
 app.post("/addVideo", upload.single("video"), async (req, res) => {
   const banner = await Banner.findOne();

@@ -21,19 +21,4 @@ function uploadFile(file, folder, contentType) {
   return s3.upload(uploadParams).promise();
 }
 
-// const uploadFile = () => {
-//   fs.readFile(fileName, (err, data) => {
-//      if (err) throw err;
-//      const params = {
-//          Bucket: 'testBucket', // pass your bucket name
-//          Key: 'contacts.csv', // file will be saved as testBucket/contacts.csv
-//          Body: JSON.stringify(data, null, 2)
-//      };
-//      s3.upload(params, function(s3Err, data) {
-//          if (s3Err) throw s3Err
-//          console.log(`File uploaded successfully at ${data.Location}`)
-//      });
-//   });
-// };
-
 exports.uploadFile = uploadFile;

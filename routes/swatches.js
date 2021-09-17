@@ -55,20 +55,30 @@ app.post("/add", upload.array("swatch_image"), async (req, res) => {
 //Get Category
 app.get("/", async (req, res) => {
   Swatch.find()
-    // .populate({
-    //   path: "product",
-    //   populate: {
-    //     path: "subCategory",
-    //   },
-    // })
+    .populate({
+      path: "products",
+      //   populate: {
+      //     path: "subCategory",
+      //   },
+    })
     .exec()
     .then((p) => {
-      console.log(p);
       res.status(200).send(p);
     })
     .catch((e) => {
       res.send({ e });
     });
+});
+
+app.post("/getFromSlug", async (req, res) => {
+  console.log(req.body.slug);
+  const h = await Swatch.find().populate("products");
+  const agaya = h.filter((aich) => {
+    return aich.products.product_slug === req.body.slug;
+  });
+  Promise.all(agaya).then((result) => {
+    res.status(200).send(result);
+  });
 });
 
 app.delete("/delete", async (req, res) => {

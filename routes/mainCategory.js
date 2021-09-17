@@ -32,7 +32,6 @@ app.post("/", async (req, res) => {
   MainCategoryModel.find(req.body)
     .exec()
     .then((p) => {
-      console.log(p);
       res.status(200).send(p);
     })
     .catch((e) => {

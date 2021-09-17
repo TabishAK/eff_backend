@@ -15,20 +15,28 @@ app.post("/add", upload.single("pdf"), async (req, res) => {
     subCategory_name: subCategory_name,
   });
 
+  let result;
+
   if (subCategoryAvailable)
     return res.status(400).send("This category already exists");
 
-  const folder = `pdf/${subCategory_name}/`;
-  const file = req.file;
-  const result = await uploadFile(file, folder, "application/pdf");
-  fs.unlinkSync(file.path);
+  try {
+    if (req.file !== undefined) {
+      const folder = `pdf/${subCategory_name}/`;
+      const file = req.file;
+      result = await uploadFile(file, folder, "application/pdf");
+      fs.unlinkSync(file.path);
 
-  if (!result) return res.status(400).send("Broucher could not be saved ");
+      if (!result) return res.status(400).send("Broucher could not be saved ");
+    }
+  } catch (err) {
+    console.log(err);
+  }
 
   const subCategory = new SubCategoryModel({
     subCategory_name: subCategory_name,
     subCategory_slug: subCategory_slug,
-    pdf: result.Location,
+    pdf: result && result.Location,
     mainCategory: mainCategory,
   });
 
@@ -71,7 +79,19 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-app.put("/update", async (req, res) => {
+app.put("/update", upload.single("pdf"), async (req, res) => {
+  try {
+    if (req.file !== undefined) {
+      const folder = `pdf/`;
+      const file = req.file;
+      const result = await uploadFile(file, folder, "application/pdf");
+      fs.unlinkSync(file.path);
+      req.body.pdf = result.Location;
+    }
+  } catch (err) {
+    console.log(err);
+  }
+
   SubCategoryModel.updateOne(
     { _id: req.body._id },
     req.body,

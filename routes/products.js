@@ -26,8 +26,6 @@ app.post(
 
     const folder1 = `${subCategory}/${product_name}/Creative Image/`;
     const folder2 = `${subCategory}/${product_name}/Broucher Image/`;
-    const folder3 = `${subCategory}/${product_name}/pdf/`;
-
     const file = req.files.product_creative_image[0];
     const result = await uploadFile(file, folder1, "image/jpeg");
     fs.unlinkSync(file.path);
@@ -70,6 +68,7 @@ app.post(
 //Get Products
 app.post("/", async (req, res) => {
   ProductModel.find(req.body)
+    .populate("subCategory")
     .exec()
     .then((p) => {
       res.status(200).send(p);
@@ -88,6 +87,21 @@ app.delete("/delete", async (req, res) => {
     .catch((e) => {
       res.send({ e });
     });
+});
+
+app.post("/getFromSlug", async (req, res) => {
+  // console.log(req);
+  const h = await ProductModel.find().populate("subCategory");
+  const agaya = h.filter((aich) => {
+    return aich.subCategory.subCategory_slug === req.body.slug;
+  });
+  if (agaya) {
+    Promise.all(agaya).then((result) => {
+      res.status(200).send(result);
+    });
+  } else {
+    res.status(200).send("No Object Found");
+  }
 });
 
 app.put(
