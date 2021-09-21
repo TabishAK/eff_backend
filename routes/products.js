@@ -113,26 +113,23 @@ app.put(
   async (req, res) => {
     try {
       if (req.files.product_creative_image !== undefined) {
-        const folder1 = `${req.subCategory}/${req.product_name}/Creative Image/`;
+        const folder1 = `${req.body.subCategory}/${req.body.product_name}/Creative Image/`;
         const file = req.files.product_creative_image[0];
         const result = await uploadFile(file, folder1, "image/jpeg");
         fs.unlinkSync(file.path);
         req.body.product_creative_image = result.Location;
       }
-
       if (req.files.product_broucher_image !== undefined) {
-        const folder2 = `${req.subCategory}/${req.product_name}/Broucher Image/`;
+        const folder2 = `${req.body.subCategory}/${req.body.product_name}/Broucher Image/`;
         const file2 = req.files.product_broucher_image[0];
         const result2 = await uploadFile(file2, folder2, "image/jpeg");
         fs.unlinkSync(file2.path);
-        req.body.product_creative_image = result2.Location;
+        req.body.product_broucher_image = result2.Location;
       }
     } catch (err) {
       console.log(err);
     }
-
     const hell = JSON.parse(JSON.stringify(req.body));
-
     ProductModel.updateOne({ _id: req.body._id }, hell, (error, success) => {
       if (error) {
         res.send({
