@@ -17,13 +17,6 @@ app.post(
     const { product_name, product_slug, subCategory, product_description } =
       req.body;
 
-    const productAvailable = await ProductModel.findOne({
-      product_name: product_name,
-    });
-
-    if (productAvailable)
-      return res.status(400).send("This Product already exists");
-
     const folder1 = `${subCategory}/${product_name}/Creative Image/`;
     const folder2 = `${subCategory}/${product_name}/Broucher Image/`;
     const file = req.files.product_creative_image[0];
@@ -49,7 +42,7 @@ app.post(
       product_description: product_description,
     });
 
-    products
+    await products
       .save()
       .then((c) => {
         res.status(200).json({
