@@ -72,7 +72,12 @@ app.get("/", async (req, res) => {
 
 app.post("/getFromSlug", async (req, res) => {
   console.log(req.body.slug);
-  const h = await Swatch.find().populate("products");
+  const h = await Swatch.find().populate({
+    path: "products",
+    populate: {
+      path: "subCategory",
+    },
+  });
   const agaya = h.filter((aich) => {
     return aich.products.product_slug === req.body.slug;
   });
