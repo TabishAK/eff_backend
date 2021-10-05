@@ -72,8 +72,8 @@ app.post(
 );
 
 //Get Category
-app.post("/", async (req, res) => {
-  SubCategoryModel.find(req.body)
+app.get("/", async (req, res) => {
+  SubCategoryModel.find()
     .populate("mainCategory")
     .exec()
     .then((p) => {
