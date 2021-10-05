@@ -59,8 +59,8 @@ app.post(
 );
 
 //Get Products
-app.post("/", async (req, res) => {
-  ProductModel.find(req.body)
+app.get("/", async (req, res) => {
+  ProductModel.find()
     .populate("subCategory")
     .exec()
     .then((p) => {
