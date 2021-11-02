@@ -7,33 +7,36 @@ const ProductsModel = require("../models/productsModal");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
+const _ = require("lodash");
 
 app.post("/add", upload.array("swatch_image"), async (req, res) => {
   const s = await Swatch.find({});
-
   if (s) {
     const { products } = req.body;
     var swatches = [];
     var PM = await ProductsModel.findOne({ _id: products });
-    const folder = `${PM.subCategory}/${PM.product_name}/swatches/`;
+    var sw = await Swatch.findOne({ products: products });
 
+    if (sw) {
+      return res
+        .status(400)
+        .send({ message: "The swatch of this product already exist." });
+    }
+
+    const folder = `${PM.subCategory}/${PM.product_name}/swatches/`;
     const agaya = req.files.map(async (r) => {
       let result = await uploadFile(r, folder, "image/jpeg");
       fs.unlinkSync(r.path);
       return result;
     });
-
     const arr = await Promise.all(agaya);
-
     arr.map((s) => {
       swatches.push({ swatch_image: s.Location });
     });
-
     const swatch = new Swatch({
       swatches: swatches,
       products: products,
     });
-
     swatch
       .save()
       .then((c) => {
@@ -97,36 +100,44 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-// app.put("/update", upload.single("swatch_image"), async (req, res) => {
-//   var swatches = [];
-//   var PM = await ProductsModel.findOne({ _id: products });
-//   const folder = `${PM.subCategory}/${PM.product_name}/swatches/`;
+app.put("/update", upload.array("swatch_image"), async (req, res) => {
+  const obj = JSON.parse(JSON.stringify(req.body));
+  const obj2 = JSON.parse(JSON.stringify(req.files));
 
-//   const agaya = req.files.map(async (r, i) => {
-//     fs.unlinkSync(r.path);
-//     let result = await uploadFile(r, folder);
-//     return result;
-//   });
+  var swatches = [];
+  var PM = await ProductsModel.findOne({ _id: obj.products });
+  const folder = `${PM.subCategory}/${PM.product_name}/swatches/`;
 
-//   const arr = await Promise.all(agaya);
+  const temp = _.isEmpty(obj2);
+  if (temp !== true) {
+    const agaya = req.files.map(async (r, i) => {
+      let result = await uploadFile(r, folder, "image/jpeg");
+      fs.unlinkSync(r.path);
+      return result;
+    });
 
-//   arr.map((s) => {
-//     swatches.push({ swatch_image: s.Location });
-//   });
+    const arr = await Promise.all(agaya);
 
-//   Swatch.updateOne({ _id: req.body._id }, hell, (error, success) => {
-//     if (error) {
-//       res.send({
-//         message: "Update fail !",
-//         error,
-//       });
-//     } else {
-//       res.send({
-//         message: "Successfuly updated !",
-//         success,
-//       });
-//     }
-//   });
-// });
+    arr.map((s) => {
+      swatches.push({ swatch_image: s.Location });
+    });
+  }
+
+  const aikobj = { swatches: swatches, products: obj.products };
+
+  Swatch.updateOne({ _id: obj._id }, aikobj, (error, success) => {
+    if (error) {
+      res.send({
+        message: "Update fail !",
+        error,
+      });
+    } else {
+      res.send({
+        message: "Successfuly updated !",
+        success,
+      });
+    }
+  });
+});
 
 module.exports = app;

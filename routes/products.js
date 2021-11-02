@@ -71,6 +71,22 @@ app.get("/", async (req, res) => {
     });
 });
 
+app.post("/getWithPagination", async (req, res) => {
+  let count = await ProductModel.countDocuments();
+  const nav = Math.ceil(count / req.body.pageSize);
+  ProductModel.find()
+    .populate("subCategory")
+    .skip((req.body.pageNumber - 1) * req.body.pageSize)
+    .limit(req.body.pageSize)
+    .exec()
+    .then((p) => {
+      res.status(200).send({ p, nav });
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 app.delete("/delete", async (req, res) => {
   const { _id, product_image } = req.body;
   ProductModel.deleteOne({ _id: _id })
@@ -104,26 +120,33 @@ app.put(
     { name: "product_broucher_image" },
   ]),
   async (req, res) => {
-    try {
-      if (req.files.product_creative_image !== undefined) {
-        const folder1 = `${req.body.subCategory}/${req.body.product_name}/Creative Image/`;
-        const file = req.files.product_creative_image[0];
-        const result = await uploadFile(file, folder1, "image/jpeg");
-        fs.unlinkSync(file.path);
-        req.body.product_creative_image = result.Location;
+    const obj = JSON.parse(JSON.stringify(req.body));
+    const obj2 = JSON.parse(JSON.stringify(req.files));
+    const temp = _.isEmpty(obj2);
+
+    if (temp === false) {
+      try {
+        if (obj2.product_creative_image !== undefined) {
+          const folder1 = `${obj.subCategory}/${obj.product_name}/Creative Image/`;
+          const file = obj2.product_creative_image[0];
+          const result = await uploadFile(file, folder1, "image/jpeg");
+          fs.unlinkSync(file.path);
+          obj.product_creative_image = result.Location;
+        }
+        if (obj2.product_broucher_image !== undefined) {
+          const folder2 = `${obj.subCategory}/${obj.product_name}/Broucher Image/`;
+          const file2 = obj2.product_broucher_image[0];
+          const result2 = await uploadFile(file2, folder2, "image/jpeg");
+          fs.unlinkSync(file2.path);
+          obj.product_broucher_image = result2.Location;
+        }
+      } catch (err) {
+        console.log(err);
       }
-      if (req.files.product_broucher_image !== undefined) {
-        const folder2 = `${req.body.subCategory}/${req.body.product_name}/Broucher Image/`;
-        const file2 = req.files.product_broucher_image[0];
-        const result2 = await uploadFile(file2, folder2, "image/jpeg");
-        fs.unlinkSync(file2.path);
-        req.body.product_broucher_image = result2.Location;
-      }
-    } catch (err) {
-      console.log(err);
     }
-    const hell = JSON.parse(JSON.stringify(req.body));
-    ProductModel.updateOne({ _id: req.body._id }, hell, (error, success) => {
+
+    const hell = JSON.parse(JSON.stringify(obj));
+    ProductModel.updateOne({ _id: obj._id }, hell, (error, success) => {
       if (error) {
         res.send({
           message: "Update fail !",

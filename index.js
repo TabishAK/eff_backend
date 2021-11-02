@@ -11,6 +11,7 @@ const swatches = require("./routes/swatches");
 const distributor = require("./routes/distributor");
 const banner = require("./routes/banner");
 const user = require("./routes/user");
+const customer = require("./routes/customerRoute");
 
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
@@ -46,6 +47,8 @@ app.use("/swatches", swatches);
 app.use("/distributors", distributor);
 app.use("/mainCategory", mainCategory);
 app.use("/subCategories", subCategories);
+app.use("/customerAuth", customer);
+
 app.use("/auth", user);
 
 app.set("port", process.env.PORT || 8000);

@@ -1,0 +1,124 @@
+const CustomerModel = require("../models/customerModel");
+const express = require("express");
+const app = express.Router();
+const bcrypt = require("bcrypt");
+const _ = require("lodash");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+var passport = require("passport");
+const sgMail = require("@sendgrid/mail");
+var cookieParser = require("cookie-parser");
+sgMail.setApiKey(
+  "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"
+);
+
+app.use(cookieParser());
+
+app.post("/signup", async (req, res) => {
+  let customer = await CustomerModel.findOne({ email: req.body.email });
+  if (customer) return res.status(400).send("This Email Already Registered");
+
+  let newCustomer = new CustomerModel({
+    name: req.body.name,
+    username: req.body.username,
+    email: req.body.email,
+    password: req.body.password,
+    emailToken: crypto.randomBytes(64).toString("hex"),
+    isVerified: false,
+  });
+
+  const msg = {
+    from: "talikhan@take4media.com",
+    to: newCustomer.email,
+    subject: "Exclusive Fabrics Furnishing - Verify Your Email",
+    text: `Hello, thanks for registering on our site.
+    Please copy and the address below to verify your account. 
+    http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}`,
+
+    html: `<table border="0" cellspacing="0" cellpadding="10" style="font-family:arial; font-size:10pt; width:800px; margin:0 auto">
+    <tbody><tr><td>
+    <img 
+      src="https://eff-photos.s3.ap-southeast-1.amazonaws.com/logo/eff_updated.png" naturalheight="0" naturalwidth="0"
+      alt="EFF" 
+      style="cursor: pointer; max-width: 35%; height: auto; position: relative !important; left: -55px; margin-bottom: -28px !important;"
+      /> 
+      
+      <div style="border-bottom:dotted 1px #444"><br></div></td></tr><tr><td><p style="font-family:arial; font-size:10pt; color:#828282">
+    <span style="font-size:16px; font-weight:bold">Hello ${newCustomer.name}!</span><br></p>
+    <span style="font-size:16px; font-weight:bold">EFF Website registration</span><br></p>
+    <div class="x_translatedBlock">Thankyou for registering with the Exclusive Fabrics Website.</div><p></p></td></tr><tr><td>
+    <p>Please click the link below to verify your account<p>
+    <a href="http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${req.body.slugForBroucher}"> Verify your account </a>
+    <br/>
+    <div style="border-top:dotted 1px #444"><br></div><p style="font-family:arial; font-size:7pt; color:#828282">Confidentiality Notice:<br><br><span class="x_translatedBlock">The information in this email is confidential and is intended solely for the addressee. If you are not the intended recipient, you must not read, use or disseminate the information contained. Any views expressed in this message are those of the individual sender, except where the sender specifically states them to be the views of Romo Ltd. Romo Ltd owns the intellectual property rights and copyright of all images and products relating to the Romo, Black Edition, Villa Nova, Mark Alexander, Zinc Textile and Kirkby Design brands of furnishing fabrics, wallcoverings and trimmings. Any unauthorised reproduction or copying of Romo Ltd products or images may result in legal action. Romo Ltd is a Limited Company registered in England and Wales. The registered office address is:  Exclusive Fabrics | 440 Boulder Court, Suite 100, Pleasanton, CA 94566</span> 
+    </p></td></tr>
+    </tbody>
+    </table>`,
+
+    // html: `<h1>Hello ${newCustomer.name}!</h1>
+    //        <h3>EFF Website Registration</h3><br/>
+    //       <p>Thanks for registering in Exclusive Fabrics Furnsishing.</p><br/>
+    //       <p>Please click the link below to verify your account<p>
+    //       <a href="http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${newCustomer.emailToken}"> Verify your account </a>
+    //        <br/>
+    //        <br/>
+    //        <p>Thank you!</p>
+    //       `,
+  };
+  try {
+    await sgMail.send(msg, function (err) {
+      if (err) {
+        console.log(err);
+        return res.status(400).send(err.mmes);
+      }
+    });
+    const result = await newCustomer.save();
+    if (result) {
+      res.status(200).send({
+        message:
+          "Thanks for registering. Please check your email to veify your account.",
+      });
+    }
+  } catch (err) {
+    return res.status(400).send(err.message, "Something went wrong.");
+  }
+});
+
+app.get("/verify-email", async (req, res, next) => {
+  try {
+    const user = await CustomerModel.findOne({ emailToken: req.query.token });
+    if (!user) {
+      console.log("Token is Invalid.");
+      return res.status(400).send("Token is Invalid.");
+    }
+    user.emailToken = null;
+    user.isVerified = true;
+    await user.save();
+
+    const token = jwt.sign(
+      { id: user._id, name: user.name, email: user.email },
+      "jwtprivatekey"
+    );
+
+    res.cookie("eff_customer", token, { httpOnly: true });
+    return res.redirect(`http://localhost:3000${req.query.slugForBroucher}`);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.post("/signin", async (req, res) => {
+  let customer = await CustomerModel.findOne({ email: req.body.email });
+  if (!customer) return res.status(400).send("Invalid Email or Password");
+
+  const validPassword = bcrypt.compare(req.body.password, customer.password);
+  if (!validPassword) return res.status(400).send("Invalid Email or Password");
+
+  const token = jwt.sign(
+    { id: customer._id, password: customer.name, email: customer.email },
+    "eff_jwt_key"
+  );
+  res.send(token);
+});
+
+module.exports = app;
