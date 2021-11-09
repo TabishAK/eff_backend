@@ -57,7 +57,7 @@ app.post("/signup", async (req, res) => {
     <span style="font-size:16px; font-weight:bold">EFF Website registration</span><br></p>
     <div class="x_translatedBlock">Thankyou for registering with the Exclusive Fabrics Website.</div><p></p></td></tr><tr><td>
     <p>Please click the link below to verify your account<p>
-    <a href="http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${req.body.slugForBroucher}"> Verify your account </a>
+    <a href="https://master.d1yb3qs2lr5zz2.amplifyapp.com/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${req.body.slugForBroucher}"> Verify your account </a>
     <br/>
     <div style="border-top:dotted 1px #444"><br></div><p style="font-family:arial; font-size:7pt; color:#828282">Confidentiality Notice:<br><br><span class="x_translatedBlock">The information in this email is confidential and is intended solely for the addressee. If you are not the intended recipient, you must not read, use or disseminate the information contained. Any views expressed in this message are those of the individual sender, except where the sender specifically states them to be the views of Romo Ltd. Romo Ltd owns the intellectual property rights and copyright of all images and products relating to the Romo, Black Edition, Villa Nova, Mark Alexander, Zinc Textile and Kirkby Design brands of furnishing fabrics, wallcoverings and trimmings. Any unauthorised reproduction or copying of Romo Ltd products or images may result in legal action. Romo Ltd is a Limited Company registered in England and Wales. The registered office address is:  Exclusive Fabrics | 440 Boulder Court, Suite 100, Pleasanton, CA 94566</span>
     </p></td></tr>
