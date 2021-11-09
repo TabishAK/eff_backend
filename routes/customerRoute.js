@@ -8,6 +8,8 @@ const crypto = require("crypto");
 var passport = require("passport");
 const sgMail = require("@sendgrid/mail");
 var cookieParser = require("cookie-parser");
+var settTheVar = express();
+
 sgMail.setApiKey(
   "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"
 );
@@ -15,46 +17,52 @@ sgMail.setApiKey(
 app.use(cookieParser());
 
 app.post("/signup", async (req, res) => {
-  let customer = await CustomerModel.findOne({ email: req.body.email });
+  let customer = await CustomerModel.findOne({
+    email: req.body.email,
+    isVerified: true,
+  });
   if (customer) return res.status(400).send("This Email Already Registered");
 
-  let newCustomer = new CustomerModel({
-    name: req.body.name,
-    username: req.body.username,
+  await CustomerModel.deleteOne({
     email: req.body.email,
-    password: req.body.password,
-    emailToken: crypto.randomBytes(64).toString("hex"),
     isVerified: false,
   });
 
+  let newCustomer = new CustomerModel({
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    email: req.body.email,
+    contact_no: req.body.contact_no,
+    password: req.body.password,
+    confirm_password: req.body.confirm_password,
+    emailToken: crypto.randomBytes(64).toString("hex"),
+    isVerified: false,
+  });
   const msg = {
     from: "talikhan@take4media.com",
     to: newCustomer.email,
     subject: "Exclusive Fabrics Furnishing - Verify Your Email",
     text: `Hello, thanks for registering on our site.
-    Please copy and the address below to verify your account. 
+    Please copy and the address below to verify your account.
     http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}`,
-
     html: `<table border="0" cellspacing="0" cellpadding="10" style="font-family:arial; font-size:10pt; width:800px; margin:0 auto">
     <tbody><tr><td>
-    <img 
+    <img
       src="https://eff-photos.s3.ap-southeast-1.amazonaws.com/logo/eff_updated.png" naturalheight="0" naturalwidth="0"
-      alt="EFF" 
+      alt="EFF"
       style="cursor: pointer; max-width: 35%; height: auto; position: relative !important; left: -55px; margin-bottom: -28px !important;"
-      /> 
-      
+      />
       <div style="border-bottom:dotted 1px #444"><br></div></td></tr><tr><td><p style="font-family:arial; font-size:10pt; color:#828282">
-    <span style="font-size:16px; font-weight:bold">Hello ${newCustomer.name}!</span><br></p>
+    <span style="font-size:16px; font-weight:bold">Hello ${newCustomer.first_name}!</span><br></p>
     <span style="font-size:16px; font-weight:bold">EFF Website registration</span><br></p>
     <div class="x_translatedBlock">Thankyou for registering with the Exclusive Fabrics Website.</div><p></p></td></tr><tr><td>
     <p>Please click the link below to verify your account<p>
     <a href="http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${req.body.slugForBroucher}"> Verify your account </a>
     <br/>
-    <div style="border-top:dotted 1px #444"><br></div><p style="font-family:arial; font-size:7pt; color:#828282">Confidentiality Notice:<br><br><span class="x_translatedBlock">The information in this email is confidential and is intended solely for the addressee. If you are not the intended recipient, you must not read, use or disseminate the information contained. Any views expressed in this message are those of the individual sender, except where the sender specifically states them to be the views of Romo Ltd. Romo Ltd owns the intellectual property rights and copyright of all images and products relating to the Romo, Black Edition, Villa Nova, Mark Alexander, Zinc Textile and Kirkby Design brands of furnishing fabrics, wallcoverings and trimmings. Any unauthorised reproduction or copying of Romo Ltd products or images may result in legal action. Romo Ltd is a Limited Company registered in England and Wales. The registered office address is:  Exclusive Fabrics | 440 Boulder Court, Suite 100, Pleasanton, CA 94566</span> 
+    <div style="border-top:dotted 1px #444"><br></div><p style="font-family:arial; font-size:7pt; color:#828282">Confidentiality Notice:<br><br><span class="x_translatedBlock">The information in this email is confidential and is intended solely for the addressee. If you are not the intended recipient, you must not read, use or disseminate the information contained. Any views expressed in this message are those of the individual sender, except where the sender specifically states them to be the views of Romo Ltd. Romo Ltd owns the intellectual property rights and copyright of all images and products relating to the Romo, Black Edition, Villa Nova, Mark Alexander, Zinc Textile and Kirkby Design brands of furnishing fabrics, wallcoverings and trimmings. Any unauthorised reproduction or copying of Romo Ltd products or images may result in legal action. Romo Ltd is a Limited Company registered in England and Wales. The registered office address is:  Exclusive Fabrics | 440 Boulder Court, Suite 100, Pleasanton, CA 94566</span>
     </p></td></tr>
     </tbody>
     </table>`,
-
     // html: `<h1>Hello ${newCustomer.name}!</h1>
     //        <h3>EFF Website Registration</h3><br/>
     //       <p>Thanks for registering in Exclusive Fabrics Furnsishing.</p><br/>
@@ -72,6 +80,10 @@ app.post("/signup", async (req, res) => {
         return res.status(400).send(err.mmes);
       }
     });
+
+    const salt = await bcrypt.genSalt(10);
+    newCustomer.password = await bcrypt.hash(newCustomer.password, salt);
+
     const result = await newCustomer.save();
     if (result) {
       res.status(200).send({
@@ -96,14 +108,24 @@ app.get("/verify-email", async (req, res, next) => {
     await user.save();
 
     const token = jwt.sign(
-      { id: user._id, name: user.name, email: user.email },
+      { id: user._id, first_name: user.first_name, email: user.email },
       "jwtprivatekey"
     );
 
-    res.cookie("eff_customer", token, { httpOnly: true });
+    settTheVar.set("eff_token", `${token}`);
     return res.redirect(`http://localhost:3000${req.query.slugForBroucher}`);
   } catch (err) {
     console.log(err);
+  }
+});
+
+app.get("/getToken", async (req, res) => {
+  if (settTheVar.get("eff_token")) {
+    res.status(200).send({ token: settTheVar.get("eff_token") });
+    settTheVar.set("eff_token", null);
+    return;
+  } else {
+    return res.status(404).send({ message: "No Token Found" });
   }
 });
 
@@ -111,14 +133,24 @@ app.post("/signin", async (req, res) => {
   let customer = await CustomerModel.findOne({ email: req.body.email });
   if (!customer) return res.status(400).send("Invalid Email or Password");
 
-  const validPassword = bcrypt.compare(req.body.password, customer.password);
+  const validPassword = await bcrypt.compare(
+    req.body.password,
+    customer.password
+  );
+
   if (!validPassword) return res.status(400).send("Invalid Email or Password");
 
+  if (customer.isVerified === false) {
+    return res
+      .status(400)
+      .send("Your Account is not verified. Please verify your account.");
+  }
+
   const token = jwt.sign(
-    { id: customer._id, password: customer.name, email: customer.email },
+    { id: customer._id, password: customer.first_name, email: customer.email },
     "eff_jwt_key"
   );
-  res.send(token);
+  res.status(200).send(token);
 });
 
 module.exports = app;
