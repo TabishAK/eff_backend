@@ -44,7 +44,7 @@ app.post("/signup", async (req, res) => {
     subject: "Exclusive Fabrics Furnishing - Verify Your Email",
     text: `Hello, thanks for registering on our site.
     Please copy and the address below to verify your account.
-    http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}`,
+    http://master.d1yb3qs2lr5zz2.amplifyapp.com/customerAuth/verify-email?token=${newCustomer.emailToken}`,
     html: `<table border="0" cellspacing="0" cellpadding="10" style="font-family:arial; font-size:10pt; width:800px; margin:0 auto">
     <tbody><tr><td>
     <img
@@ -113,7 +113,9 @@ app.get("/verify-email", async (req, res, next) => {
     );
 
     settTheVar.set("eff_token", `${token}`);
-    return res.redirect(`http://localhost:3000${req.query.slugForBroucher}`);
+    return res.redirect(
+      `https://master.d1yb3qs2lr5zz2.amplifyapp.com${req.query.slugForBroucher}`
+    );
   } catch (err) {
     console.log(err);
   }
