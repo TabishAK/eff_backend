@@ -3,7 +3,6 @@ var cors = require("cors");
 var app = express();
 var bodyParser = require("body-parser");
 var mongoose = require("mongoose");
-var multipart = require("connect-multiparty");
 const products = require("./routes/products");
 const mainCategory = require("./routes/mainCategory");
 const subCategories = require("./routes/subCategory");
@@ -22,6 +21,8 @@ mongoose.connect(
     useCreateIndex: true,
   }
 );
+
+app.use(cors());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
