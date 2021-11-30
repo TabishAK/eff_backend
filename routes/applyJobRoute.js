@@ -20,15 +20,7 @@ app.post(
   [upload.single("resume"), cors(corsOptions)],
   async (req, res) => {
     const obj = JSON.parse(JSON.stringify(req.body));
-    const {
-      first_name,
-      last_name,
-      email,
-      contact_no,
-      job_post,
-      resume,
-      userID,
-    } = obj;
+    const { first_name, last_name, email, contact_no, job_post, userID } = obj;
 
     const file = JSON.parse(JSON.stringify(req.file));
 
