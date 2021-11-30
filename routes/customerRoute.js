@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 const _ = require("lodash");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
-var passport = require("passport");
 const sgMail = require("@sendgrid/mail");
 var cookieParser = require("cookie-parser");
 var settTheVar = express();
@@ -67,15 +66,6 @@ app.post("/signup", async (req, res) => {
     </p></td></tr>
     </tbody>
     </table>`,
-    // html: `<h1>Hello ${newCustomer.name}!</h1>
-    //        <h3>EFF Website Registration</h3><br/>
-    //       <p>Thanks for registering in Exclusive Fabrics Furnsishing.</p><br/>
-    //       <p>Please click the link below to verify your account<p>
-    //       <a href="http://localhost:8000/customerAuth/verify-email?token=${newCustomer.emailToken}&slugForBroucher=${newCustomer.emailToken}"> Verify your account </a>
-    //        <br/>
-    //        <br/>
-    //        <p>Thank you!</p>
-    //       `,
   };
   try {
     await sgMail.send(msg, function (err) {

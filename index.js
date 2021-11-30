@@ -13,6 +13,8 @@ const banner = require("./routes/banner");
 const user = require("./routes/user");
 const customer = require("./routes/customerRoute");
 
+const applyJob = require("./routes/applyJobRoute");
+
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
   {
@@ -48,6 +50,7 @@ app.use("/distributors", distributor);
 app.use("/mainCategory", mainCategory);
 app.use("/subCategories", subCategories);
 app.use("/customerAuth", customer);
+app.use("/apply_job", applyJob);
 
 app.use("/auth", user);
 
