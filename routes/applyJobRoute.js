@@ -7,56 +7,45 @@ const fs = require("fs");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
 
-var cors = require("cors");
-
-var corsOptions = {
-  origin: "http://localhost:3000",
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
-
 // Add category
-app.post(
-  "/",
-  [upload.single("resume"), cors(corsOptions)],
-  async (req, res) => {
-    const obj = JSON.parse(JSON.stringify(req.body));
-    const { first_name, last_name, email, contact_no, job_post, userID } = obj;
+app.post("/", upload.single("resume"), async (req, res) => {
+  const obj = JSON.parse(JSON.stringify(req.body));
+  const { first_name, last_name, email, contact_no, job_post, userID } = obj;
 
-    const file = JSON.parse(JSON.stringify(req.file));
+  const file = JSON.parse(JSON.stringify(req.file));
 
-    try {
-      const folder = `pdf/resumes/${userID}`;
-      result = await uploadFile(file, folder, "application/pdf");
-      fs.unlinkSync(file.path);
+  try {
+    const folder = `pdf/resumes/${userID}`;
+    result = await uploadFile(file, folder, "application/pdf");
+    fs.unlinkSync(file.path);
 
-      if (!result) return res.status(400).send("Broucher could not be saved ");
-    } catch (err) {
-      console.log(err);
-    }
-
-    const applyJobModel = new ApplyJobModel({
-      first_name: first_name,
-      last_name: last_name,
-      email: email,
-      resume: result && result.Location,
-      job_post: job_post,
-      contact_no: contact_no,
-      userID: userID,
-    });
-
-    applyJobModel
-      .save()
-      .then((c) => {
-        res.status(200).json({
-          message: "Subcategory Created",
-          subCategory: c,
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          error: err,
-        });
-      });
+    if (!result) return res.status(400).send("Broucher could not be saved ");
+  } catch (err) {
+    console.log(err);
   }
-);
+
+  const applyJobModel = new ApplyJobModel({
+    first_name: first_name,
+    last_name: last_name,
+    email: email,
+    resume: result && result.Location,
+    job_post: job_post,
+    contact_no: contact_no,
+    userID: userID,
+  });
+
+  applyJobModel
+    .save()
+    .then((c) => {
+      res.status(200).json({
+        message: "Subcategory Created",
+        subCategory: c,
+      });
+    })
+    .catch((err) => {
+      res.status(500).json({
+        error: err,
+      });
+    });
+});
 module.exports = app;
