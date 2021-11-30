@@ -38,7 +38,7 @@ app.post("/", upload.single("resume"), async (req, res) => {
     .save()
     .then((c) => {
       res.status(200).json({
-        message: "Subcategory Created",
+        message: "Job Applied",
         subCategory: c,
       });
     })
