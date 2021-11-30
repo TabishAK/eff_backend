@@ -12,7 +12,6 @@ const distributor = require("./routes/distributor");
 const banner = require("./routes/banner");
 const user = require("./routes/user");
 const customer = require("./routes/customerRoute");
-
 const applyJob = require("./routes/applyJobRoute");
 
 mongoose.connect(
@@ -25,6 +24,7 @@ mongoose.connect(
 );
 
 app.use(cors());
+
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(
   bodyParser.urlencoded({
