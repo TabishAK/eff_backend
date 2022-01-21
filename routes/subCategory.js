@@ -13,12 +13,14 @@ app.post(
   upload.fields([{ name: "pdf" }, { name: "subCategory_image" }]),
   async (req, res) => {
     const obj = JSON.parse(JSON.stringify(req.body));
-    const { subCategory_name, subCategory_slug, mainCategory } = obj;
+    const {
+      subCategory_name,
+      subCategory_slug,
+      subCategory_description,
+      mainCategory,
+    } = obj;
 
     const obj2 = JSON.parse(JSON.stringify(req.files));
-
-    console.log(obj);
-    console.log(obj2);
 
     const subCategoryAvailable = await SubCategoryModel.findOne({
       subCategory_name: subCategory_name,
@@ -53,6 +55,7 @@ app.post(
       pdf: result && result.Location,
       subCategory_image: result2 && result2.Location,
       mainCategory: mainCategory,
+      subCategory_description: subCategory_description,
     });
 
     subCategory
@@ -74,6 +77,18 @@ app.post(
 //Get Category
 app.get("/", async (req, res) => {
   SubCategoryModel.find()
+    .populate("mainCategory")
+    .exec()
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
+app.get("/bySlug", async (req, res) => {
+  SubCategoryModel.findOne({ subCategory_slug: req.query.subCategory })
     .populate("mainCategory")
     .exec()
     .then((p) => {

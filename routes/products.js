@@ -99,7 +99,6 @@ app.delete("/delete", async (req, res) => {
 });
 
 app.post("/getFromSlug", async (req, res) => {
-  // console.log(req);
   const h = await ProductModel.find().populate("subCategory");
   const agaya = h.filter((aich) => {
     return aich.subCategory.subCategory_slug === req.body.slug;
