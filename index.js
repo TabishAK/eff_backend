@@ -12,6 +12,9 @@ const banner = require("./routes/banner");
 const user = require("./routes/user");
 const customer = require("./routes/customerRoute");
 const applyJob = require("./routes/applyJobRoute");
+const aboutUs = require("./routes/aboutUsRoute");
+const homePageContent = require("./routes/homePageContentRoute");
+const careers = require("./routes/careersRoute");
 
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
@@ -23,10 +26,12 @@ mongoose.connect(
 );
 
 app.use(cors());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true }));
+// app.use(bodyParser.json());
 app.use(express.json());
 
-app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.json({ limit: "500mb" }));
 
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -45,7 +50,9 @@ app.use("/mainCategory", mainCategory);
 app.use("/subCategories", subCategories);
 app.use("/customerAuth", customer);
 app.use("/apply_job", applyJob);
-
+app.use("/homePageContent", homePageContent);
+app.use("/aboutUs", aboutUs);
+app.use("/careers", careers);
 app.use("/auth", user);
 
 app.set("port", process.env.PORT || 8000);
