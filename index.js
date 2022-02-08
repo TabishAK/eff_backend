@@ -15,6 +15,7 @@ const applyJob = require("./routes/applyJobRoute");
 const aboutUs = require("./routes/aboutUsRoute");
 const homePageContent = require("./routes/homePageContentRoute");
 const careers = require("./routes/careersRoute");
+const facilities = require("./routes/facilitiesRoute");
 
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
@@ -54,6 +55,7 @@ app.use("/homePageContent", homePageContent);
 app.use("/aboutUs", aboutUs);
 app.use("/careers", careers);
 app.use("/auth", user);
+app.use("/facilities", facilities);
 
 app.set("port", process.env.PORT || 8000);
 app.listen(app.get("port"), () =>

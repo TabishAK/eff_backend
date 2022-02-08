@@ -10,6 +10,7 @@ const jobsArray = new mongoose.Schema({
   designation_name: { type: String, required: false },
   area: { type: String, required: false },
   country: { type: String, required: false },
+  job_type: { type: String, required: false },
 });
 
 const careerSchema = new mongoose.Schema({
