@@ -115,7 +115,7 @@ app.get("/verify-email", async (req, res, next) => {
 
     settTheVar.set("eff_token", `${token}`);
     return res.redirect(
-      `https://master.d1yb3qs2lr5zz2.amplifyapp.com${req.query.slugForBroucher}`
+      `https://master.dkpe791az3r03.amplifyapp.com${req.query.slugForBroucher}`
     );
   } catch (err) {
     console.log(err);

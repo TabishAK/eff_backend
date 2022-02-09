@@ -3,7 +3,7 @@ const express = require("express");
 const app = express.Router();
 
 app.get("/", async (req, res) => {
-  AboutUsModel.find()
+  AboutUsModel.findOne()
     .exec()
     .then((p) => {
       res.status(200).send(p);
