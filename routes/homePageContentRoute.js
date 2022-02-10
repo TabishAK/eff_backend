@@ -6,6 +6,17 @@ const fs = require("fs");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
 
+app.get("/", async (req, res) => {
+  HomePageContent.findOne()
+    .exec()
+    .then((p) => {
+      res.status(200).send(p);
+    })
+    .catch((e) => {
+      res.send({ e });
+    });
+});
+
 app.post("/add_image1", upload.single("image_1"), async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   const folder1 = "Home Page Images/";

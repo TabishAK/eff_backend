@@ -16,6 +16,7 @@ const aboutUs = require("./routes/aboutUsRoute");
 const homePageContent = require("./routes/homePageContentRoute");
 const careers = require("./routes/careersRoute");
 const facilities = require("./routes/facilitiesRoute");
+const services = require("./routes/serviceRoute");
 
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
@@ -51,11 +52,12 @@ app.use("/mainCategory", mainCategory);
 app.use("/subCategories", subCategories);
 app.use("/customerAuth", customer);
 app.use("/apply_job", applyJob);
-app.use("/homePageContent", homePageContent);
+app.use("/homePageContent", homePageContent); //add_para_below_logo
 app.use("/aboutUs", aboutUs);
 app.use("/careers", careers);
 app.use("/auth", user);
 app.use("/facilities", facilities);
+app.use("/services", services);
 
 app.set("port", process.env.PORT || 8000);
 app.listen(app.get("port"), () =>

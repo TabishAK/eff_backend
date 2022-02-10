@@ -13,60 +13,224 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.post("/add", async (req, res) => {
-  const data = await AboutUsModel.findOne();
-  if (data) {
-    res.status(200).json({
-      message: "This paragraph already exist, first deleted and then add.",
-    });
-  } else {
-    const m = new AboutUsModel({
-      para1: req.body.para1,
-      para2: req.body.para2,
-      para3: req.body.para3,
-      para4: req.body.para4,
-      para5: req.body.para5,
-    });
+app.post("/add-para-1", async (req, res) => {
+  const about = await AboutUsModel.findOne();
 
-    m.save()
-      .then((c) => {
-        res.status(200).json({
-          message: "About Us Content Created..",
-          mainCategory: c,
-        });
+  if (!about) {
+    new AboutUsModel({
+      para1: req.body.para1,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
       })
-      .catch((err) => {
-        res.status(500).json({
-          error: err,
-        });
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (about) {
+    about.para1 = req.body.para1;
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
       });
   }
 });
 
-app.delete("/delete", async (req, res) => {
-  AboutUsModel.deleteOne({ _id: req.body._id })
-    .then((p) => {
-      res.status(200).send(p);
-    })
-    .catch((e) => {
-      res.send({ e });
-    });
+app.post("/delete-para-1", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+  if (about) {
+    about.para1 = "";
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else {
+    res.status(404).send("Data isnt Availabe. Add First!");
+  }
 });
 
-app.put("/update", async (req, res) => {
-  AboutUsModel.updateOne({ _id: req.body._id }, req.body, (error, success) => {
-    if (error) {
-      res.send({
-        message: "Update fail !",
-        error,
+app.post("/add-para-2", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+
+  if (!about) {
+    new AboutUsModel({
+      para2: req.body.para2,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
       });
-    } else {
-      res.send({
-        message: "Successfuly updated !",
-        success,
+  } else if (about) {
+    about.para2 = req.body.para2;
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
       });
-    }
-  });
+  }
+});
+
+app.post("/delete-para-2", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+  if (about) {
+    about.para2 = "";
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else {
+    res.status(404).send("Data isnt Availabe. Add First!");
+  }
+});
+
+app.post("/add-para-3", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+
+  if (!about) {
+    new AboutUsModel({
+      para3: req.body.para3,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (about) {
+    about.para3 = req.body.para3;
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/delete-para-3", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+  if (about) {
+    about.para3 = "";
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else {
+    res.status(404).send("Data isnt Availabe. Add First!");
+  }
+});
+
+app.post("/add-para-4", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+
+  if (!about) {
+    new AboutUsModel({
+      para4: req.body.para4,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (about) {
+    about.para4 = req.body.para4;
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/delete-para-4", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+  if (about) {
+    about.para4 = "";
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else {
+    res.status(404).send("Data isnt Availabe. Add First!");
+  }
+});
+
+app.post("/add-para-5", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+
+  if (!about) {
+    new AboutUsModel({
+      para5: req.body.para5,
+    })
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else if (about) {
+    about.para5 = req.body.para5;
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  }
+});
+
+app.post("/delete-para-5", async (req, res) => {
+  const about = await AboutUsModel.findOne();
+  if (about) {
+    about.para5 = "";
+    about
+      .save()
+      .then((p) => {
+        res.status(200).send(p);
+      })
+      .catch((e) => {
+        res.send({ e });
+      });
+  } else {
+    res.status(404).send("Data isnt Availabe. Add First!");
+  }
 });
 
 module.exports = app;
