@@ -6,10 +6,12 @@ const multer = require("multer");
 const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const { uploadFile } = require("../services/s3");
+const auth = require("../Middlewares/auth");
 
 // Add category
 app.post(
   "/add",
+  auth,
   upload.fields([{ name: "pdf" }, { name: "subCategory_image" }]),
   async (req, res) => {
     const obj = JSON.parse(JSON.stringify(req.body));
@@ -99,7 +101,7 @@ app.get("/bySlug", async (req, res) => {
     });
 });
 
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", auth, async (req, res) => {
   const { _id } = req.body;
   SubCategoryModel.deleteOne({ _id: _id })
     .then((p) => {
@@ -112,6 +114,7 @@ app.delete("/delete", async (req, res) => {
 
 app.put(
   "/update",
+  auth,
   upload.fields([{ name: "pdf" }, { name: "subCategory_image" }]),
   async (req, res) => {
     const obj = JSON.parse(JSON.stringify(req.body));

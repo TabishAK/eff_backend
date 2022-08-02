@@ -7,7 +7,6 @@ const JobApplyFormModel = mongoose.Schema({
   contact_no: { type: String, required: true },
   job_post: { type: String, required: true },
   resume: { type: String, required: true },
-  userID: { type: String },
 });
 
 module.exports = mongoose.model("JobApplyFormModel", JobApplyFormModel);

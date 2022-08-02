@@ -5,17 +5,18 @@ var _ = require("lodash");
 const multer = require("multer");
 const fs = require("fs");
 const { uploadFile } = require("../services/s3");
+const { result } = require("lodash");
 const upload = multer({ dest: "uploads/" });
 
 // Add category
 app.post("/", upload.single("resume"), async (req, res) => {
   const obj = JSON.parse(JSON.stringify(req.body));
-  const { first_name, last_name, email, contact_no, job_post, userID } = obj;
+  const { first_name, last_name, email, contact_no, job_post } = obj;
 
   const file = JSON.parse(JSON.stringify(req.file));
 
   try {
-    const folder = `pdf/resumes/${userID}`;
+    const folder = `pdf/resumes/`;
     result = await uploadFile(file, folder, "application/pdf");
     fs.unlinkSync(file.path);
 
@@ -24,6 +25,8 @@ app.post("/", upload.single("resume"), async (req, res) => {
     console.log(err);
   }
 
+  console.log(result.Location);
+
   const applyJobModel = new ApplyJobModel({
     first_name: first_name,
     last_name: last_name,
@@ -31,7 +34,6 @@ app.post("/", upload.single("resume"), async (req, res) => {
     resume: result && result.Location,
     job_post: job_post,
     contact_no: contact_no,
-    userID: userID,
   });
 
   applyJobModel
@@ -48,4 +50,5 @@ app.post("/", upload.single("resume"), async (req, res) => {
       });
     });
 });
+
 module.exports = app;

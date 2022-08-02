@@ -17,6 +17,8 @@ const homePageContent = require("./routes/homePageContentRoute");
 const careers = require("./routes/careersRoute");
 const facilities = require("./routes/facilitiesRoute");
 const services = require("./routes/serviceRoute");
+const subscription = require("./routes/subscriptionRoute");
+const contact = require("./routes/contactRoute");
 
 mongoose.connect(
   "mongodb+srv://tabish:ichbintabish@effcluster.oca58.mongodb.net/effDatabase?retryWrites=true&w=majority",
@@ -58,8 +60,10 @@ app.use("/careers", careers);
 app.use("/auth", user);
 app.use("/facilities", facilities);
 app.use("/services", services);
+app.use("/subscribe", subscription);
+app.use("/contact", contact);
 
 app.set("port", process.env.PORT || 8000);
 app.listen(app.get("port"), () =>
-  console.log("Server is running on port 8000")
+  console.log("Server is running on port 5000")
 );

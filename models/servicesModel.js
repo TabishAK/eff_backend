@@ -11,6 +11,7 @@ const serviceArray = new mongoose.Schema({
 });
 
 const ServiceSchema = new mongoose.Schema({
+  main_service_name: { type: String, required: false },
   slug: { type: String, required: false },
   services: [serviceArray],
   process: [processArray],

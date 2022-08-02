@@ -5,8 +5,9 @@ const multer = require("multer");
 const fs = require("fs");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
+const auth = require("../Middlewares/auth");
 
-app.post("/addVideo", upload.single("video"), async (req, res) => {
+app.post("/addVideo", auth, upload.single("video"), async (req, res) => {
   const banner = await Banner.findOne();
   const folder1 = "banners/video/";
   const file = req.file;
@@ -39,7 +40,7 @@ app.post("/addVideo", upload.single("video"), async (req, res) => {
   }
 });
 
-app.delete("/deleteVideo", async (req, res) => {
+app.delete("/deleteVideo", auth, async (req, res) => {
   const banner = await Banner.findOne();
   if (banner) {
     banner.video = "";
@@ -54,7 +55,7 @@ app.delete("/deleteVideo", async (req, res) => {
   }
 });
 
-app.post("/add_image_1", upload.single("image_1"), async (req, res) => {
+app.post("/add_image_1", auth, upload.single("image_1"), async (req, res) => {
   const banner = await Banner.findOne();
   const folder1 = "banners/images/";
   const file = req.file;
@@ -89,7 +90,7 @@ app.post("/add_image_1", upload.single("image_1"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image_1", async (req, res) => {
+app.delete("/delete_image_1", auth, async (req, res) => {
   const banner = await Banner.findOne();
   if (banner) {
     banner.image_1 = "";
@@ -104,7 +105,7 @@ app.delete("/delete_image_1", async (req, res) => {
   }
 });
 
-app.post("/add_image_2", upload.single("image_2"), async (req, res) => {
+app.post("/add_image_2", auth, upload.single("image_2"), async (req, res) => {
   const banner = await Banner.findOne();
   const folder1 = "banners/images/";
   const file = req.file;
@@ -139,7 +140,7 @@ app.post("/add_image_2", upload.single("image_2"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image_2", async (req, res) => {
+app.delete("/delete_image_2", auth, async (req, res) => {
   const banner = await Banner.findOne();
   if (banner) {
     banner.image_2 = "";
@@ -154,7 +155,7 @@ app.delete("/delete_image_2", async (req, res) => {
   }
 });
 
-app.post("/add_image_3", upload.single("image_3"), async (req, res) => {
+app.post("/add_image_3", auth, upload.single("image_3"), async (req, res) => {
   const banner = await Banner.findOne();
   const folder1 = "banners/images/";
   const file = req.file;
@@ -189,7 +190,7 @@ app.post("/add_image_3", upload.single("image_3"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image_3", async (req, res) => {
+app.delete("/delete_image_3", auth, async (req, res) => {
   const banner = await Banner.findOne();
   if (banner) {
     banner.image_3 = "";

@@ -5,6 +5,7 @@ const multer = require("multer");
 const fs = require("fs");
 const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
+const auth = require("../Middlewares/auth");
 
 app.get("/", async (req, res) => {
   HomePageContent.findOne()
@@ -17,7 +18,7 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.post("/add_image1", upload.single("image_1"), async (req, res) => {
+app.post("/add_image1", auth, upload.single("image_1"), async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   const folder1 = "Home Page Images/";
   const file = req.file;
@@ -50,7 +51,7 @@ app.post("/add_image1", upload.single("image_1"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image1", async (req, res) => {
+app.delete("/delete_image1", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   if (homePageContent) {
     homePageContent.image_1 = "";
@@ -65,7 +66,7 @@ app.delete("/delete_image1", async (req, res) => {
   }
 });
 
-app.post("/add_image2", upload.single("image_2"), async (req, res) => {
+app.post("/add_image2", auth, upload.single("image_2"), async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   const folder1 = "Home Page Images/";
   const file = req.file;
@@ -98,7 +99,7 @@ app.post("/add_image2", upload.single("image_2"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image2", async (req, res) => {
+app.delete("/delete_image2", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   if (homePageContent) {
     homePageContent.image_2 = "";
@@ -113,7 +114,7 @@ app.delete("/delete_image2", async (req, res) => {
   }
 });
 
-app.post("/add_image3", upload.single("image_3"), async (req, res) => {
+app.post("/add_image3", auth, upload.single("image_3"), async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   const folder1 = "Home Page Images/";
   const file = req.file;
@@ -146,7 +147,7 @@ app.post("/add_image3", upload.single("image_3"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image3", async (req, res) => {
+app.delete("/delete_image3", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   if (homePageContent) {
     homePageContent.image_3 = "";
@@ -161,7 +162,7 @@ app.delete("/delete_image3", async (req, res) => {
   }
 });
 
-app.post("/add_image4", upload.single("image_4"), async (req, res) => {
+app.post("/add_image4", auth, upload.single("image_4"), async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   const folder1 = "Home Page Images/";
   const file = req.file;
@@ -194,7 +195,7 @@ app.post("/add_image4", upload.single("image_4"), async (req, res) => {
   }
 });
 
-app.delete("/delete_image4", async (req, res) => {
+app.delete("/delete_image4", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   if (homePageContent) {
     homePageContent.image_4 = "";
@@ -209,7 +210,7 @@ app.delete("/delete_image4", async (req, res) => {
   }
 });
 
-app.post("/add_para_below_logo", async (req, res) => {
+app.post("/add_para_below_logo", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
 
   if (!homePageContent) {
@@ -236,7 +237,7 @@ app.post("/add_para_below_logo", async (req, res) => {
   }
 });
 
-app.delete("/delete_para_below_logo", async (req, res) => {
+app.delete("/delete_para_below_logo", auth, async (req, res) => {
   const homePageContent = await HomePageContent.findOne();
   if (homePageContent) {
     homePageContent.para_below_logo = "";

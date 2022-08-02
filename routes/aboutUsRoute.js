@@ -1,6 +1,7 @@
 const AboutUsModel = require("../models/aboutUsModel");
 const express = require("express");
 const app = express.Router();
+const auth = require("../Middlewares/auth");
 
 app.get("/", async (req, res) => {
   AboutUsModel.findOne()
@@ -13,7 +14,7 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.post("/add-para-1", async (req, res) => {
+app.post("/add-para-1", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
 
   if (!about) {
@@ -40,7 +41,7 @@ app.post("/add-para-1", async (req, res) => {
   }
 });
 
-app.post("/delete-para-1", async (req, res) => {
+app.post("/delete-para-1", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
   if (about) {
     about.para1 = "";
@@ -57,7 +58,7 @@ app.post("/delete-para-1", async (req, res) => {
   }
 });
 
-app.post("/add-para-2", async (req, res) => {
+app.post("/add-para-2", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
 
   if (!about) {
@@ -84,7 +85,7 @@ app.post("/add-para-2", async (req, res) => {
   }
 });
 
-app.post("/delete-para-2", async (req, res) => {
+app.post("/delete-para-2", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
   if (about) {
     about.para2 = "";
@@ -101,7 +102,7 @@ app.post("/delete-para-2", async (req, res) => {
   }
 });
 
-app.post("/add-para-3", async (req, res) => {
+app.post("/add-para-3", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
 
   if (!about) {
@@ -128,7 +129,7 @@ app.post("/add-para-3", async (req, res) => {
   }
 });
 
-app.post("/delete-para-3", async (req, res) => {
+app.post("/delete-para-3", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
   if (about) {
     about.para3 = "";
@@ -145,7 +146,7 @@ app.post("/delete-para-3", async (req, res) => {
   }
 });
 
-app.post("/add-para-4", async (req, res) => {
+app.post("/add-para-4", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
 
   if (!about) {
@@ -172,7 +173,7 @@ app.post("/add-para-4", async (req, res) => {
   }
 });
 
-app.post("/delete-para-4", async (req, res) => {
+app.post("/delete-para-4", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
   if (about) {
     about.para4 = "";
@@ -189,7 +190,7 @@ app.post("/delete-para-4", async (req, res) => {
   }
 });
 
-app.post("/add-para-5", async (req, res) => {
+app.post("/add-para-5", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
 
   if (!about) {
@@ -216,7 +217,7 @@ app.post("/add-para-5", async (req, res) => {
   }
 });
 
-app.post("/delete-para-5", async (req, res) => {
+app.post("/delete-para-5", auth, async (req, res) => {
   const about = await AboutUsModel.findOne();
   if (about) {
     about.para5 = "";

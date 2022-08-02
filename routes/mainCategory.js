@@ -1,8 +1,9 @@
 const MainCategoryModel = require("../models/mainCategoryModel");
 const express = require("express");
 const app = express.Router();
+const auth = require("../Middlewares/auth");
 
-app.post("/add", async (req, res) => {
+app.post("/add", auth, async (req, res) => {
   const availMainCategory = await MainCategoryModel.findOne({
     category_name: req.body.category_name,
   });
@@ -39,7 +40,8 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", auth, async (req, res) => {
+  console.log(req.body);
   MainCategoryModel.deleteOne({ _id: req.body._id })
     .then((p) => {
       res.status(200).send(p);
@@ -49,7 +51,7 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-app.put("/update", async (req, res) => {
+app.put("/update", auth, async (req, res) => {
   MainCategoryModel.updateOne(
     { _id: req.body._id },
     req.body,

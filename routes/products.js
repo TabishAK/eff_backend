@@ -6,9 +6,11 @@ const { uploadFile } = require("../services/s3");
 const fs = require("fs");
 const upload = multer({ dest: "uploads/" });
 const _ = require("lodash");
+const auth = require("../Middlewares/auth");
 
 app.post(
   "/add",
+  auth,
   upload.fields([
     { name: "product_creative_image" },
     { name: "product_broucher_image" },
@@ -87,7 +89,7 @@ app.post("/getWithPagination", async (req, res) => {
     });
 });
 
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", auth, async (req, res) => {
   const { _id, product_image } = req.body;
   ProductModel.deleteOne({ _id: _id })
     .then((p) => {
@@ -114,6 +116,7 @@ app.post("/getFromSlug", async (req, res) => {
 
 app.put(
   "/update",
+  auth,
   upload.fields([
     { name: "product_creative_image" },
     { name: "product_broucher_image" },

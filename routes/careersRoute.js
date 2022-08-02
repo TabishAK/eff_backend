@@ -1,6 +1,7 @@
 const CareersModel = require("../models/careersModel");
 const express = require("express");
 const app = express.Router();
+const auth = require("../Middlewares/auth");
 
 app.get("/", async (req, res) => {
   CareersModel.findOne()
@@ -13,7 +14,7 @@ app.get("/", async (req, res) => {
     });
 });
 
-app.post("/addFirstPara", async (req, res) => {
+app.post("/addFirstPara", auth, async (req, res) => {
   const careers = await CareersModel.findOne();
 
   if (!careers) {
@@ -40,7 +41,7 @@ app.post("/addFirstPara", async (req, res) => {
   }
 });
 
-app.post("/add_job", async (req, res) => {
+app.post("/add_job", auth, async (req, res) => {
   const careers = await CareersModel.findOne();
   if (!careers) {
     let array = [];
@@ -69,7 +70,7 @@ app.post("/add_job", async (req, res) => {
   }
 });
 
-app.post("/addBenefits", async (req, res) => {
+app.post("/addBenefits", auth, async (req, res) => {
   const careers = await CareersModel.findOne();
   if (!careers) {
     let array = [];
@@ -98,25 +99,25 @@ app.post("/addBenefits", async (req, res) => {
   }
 });
 
-app.delete("/deleteBenefits", async (req, res) => {
+app.delete("/deleteBenefits", auth, async (req, res) => {
   const careers = await CareersModel.findOne();
   if (careers) {
     const benefit = careers.benefits.id(req.body._id);
     benefit.remove();
     careers.save();
-    res.status(200).send("Benefit Deleted!");
+    res.status(200).send(careers);
   } else if (!careers) {
     res.status(404).send("Data not found. Please Add some");
   }
 });
 
-app.delete("/deleteJob", async (req, res) => {
+app.delete("/deleteJob", auth, async (req, res) => {
   const careers = await CareersModel.findOne();
   if (careers) {
     const jobs = careers.jobs.id(req.body._id);
     jobs.remove();
     careers.save();
-    res.status(200).send("Job Deleted!");
+    res.status(200).send({ data: careers, message: "Job Deleted!" });
   } else if (!careers) {
     res.status(404).send("Data not found. Please Add some");
   }

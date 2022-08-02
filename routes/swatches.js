@@ -8,8 +8,9 @@ const { uploadFile } = require("../services/s3");
 const upload = multer({ dest: "uploads/" });
 const fs = require("fs");
 const _ = require("lodash");
+const auth = require("../Middlewares/auth");
 
-app.post("/add", upload.array("swatch_image"), async (req, res) => {
+app.post("/add", auth, upload.array("swatch_image"), async (req, res) => {
   const s = await Swatch.find({});
   if (s) {
     const { products } = req.body;
@@ -89,7 +90,7 @@ app.post("/getFromSlug", async (req, res) => {
   });
 });
 
-app.delete("/delete", async (req, res) => {
+app.delete("/delete", auth, async (req, res) => {
   const { _id } = req.body;
   Swatch.deleteOne({ _id: _id })
     .then((p) => {
@@ -100,7 +101,7 @@ app.delete("/delete", async (req, res) => {
     });
 });
 
-app.put("/update", upload.array("swatch_image"), async (req, res) => {
+app.put("/update", auth, upload.array("swatch_image"), async (req, res) => {
   const obj = JSON.parse(JSON.stringify(req.body));
   const obj2 = JSON.parse(JSON.stringify(req.files));
 
